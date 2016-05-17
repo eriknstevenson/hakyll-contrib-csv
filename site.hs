@@ -1,61 +1,62 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-import Control.Monad
+import           Control.Monad
 import qualified Data.ByteString.Lazy.Char8 as LBS
-import Data.Csv
+import           Data.Char
+import           Data.Csv
+import           Data.Monoid
 import qualified Data.Text as T
 import qualified Data.Vector as V
-import Lucid
-import Hakyll
+import           Lucid
+import           Hakyll
 
 main :: IO ()
 main = hakyll $ do
-  match "images/*" $ do
-    route   idRoute
-    compile copyFileCompiler
 
   match "css/*" $ do
     route   idRoute
     compile compressCssCompiler
 
-  match "js/*" $ do
-    route idRoute
-    compile copyFileCompiler
-
   match "csv/*.csv" $ do
     route $ setExtension "html" `composeRoutes` gsubRoute "csv/" (const "")
     compile $ do
       table <- csvCompiler
-      loadAndApplyTemplate "templates/default.html" defaultContext (fmap LBS.unpack table) >>= relativizeUrls
+      loadAndApplyTemplate "templates/default.html" (csvContext <> defaultContext) (fmap LBS.unpack table) >>= relativizeUrls
 
   match "templates/*" $ compile templateCompiler
 
-data CourseWare = CourseWare
+data CSVFile = CSVFile
   { courseID :: !Int
   , title    :: !String
   } deriving (Show)
 
-instance FromNamedRecord CourseWare where
-    parseNamedRecord r = CourseWare <$> r .: "id" <*> r .: "title"
+instance FromNamedRecord CSVFile where
+    parseNamedRecord r = CSVFile <$> r .: "id" <*> r .: "title"
 
 csvCompiler :: Compiler (Item LBS.ByteString)
-csvCompiler =
-  getResourceLBS >>= withItemBody (csvToHtml)
+csvCompiler = do
+  identifier <- T.pack . filterIdentifier <$> getUnderlying
+  getResourceLBS >>= withItemBody (csvToHtml identifier)
 
-csvToHtml :: LBS.ByteString -> Compiler LBS.ByteString
-csvToHtml bs =
+csvToHtml :: T.Text -> LBS.ByteString -> Compiler LBS.ByteString
+csvToHtml identifier bs =
   case decodeByName bs of
     Left err -> return . LBS.pack $ err
     Right (_, rows) -> return . renderBS $
     --cellspacing_ "0"
-      table_ [id_ "sortedTable", class_ "display", width_ "100%"] $ do
+      table_ [id_ identifier, class_ "display", width_ "100%"] $ do
         thead_ $ tr_ $ do
           th_ "id"
           th_ "title"
         tbody_ $
           V.forM_ rows makeRow
 
-makeRow :: CourseWare -> Html ()
+makeRow :: CSVFile -> Html ()
 makeRow row = tr_ $ do
   td_ $ toHtml . show . courseID $ row
   td_ $ toHtml . title $ row
+
+csvContext = field "idname" $ return . filterIdentifier . itemIdentifier
+
+filterIdentifier = filter (isLetter) . show
+
