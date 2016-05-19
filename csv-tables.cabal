@@ -1,8 +1,8 @@
-name:                csv-tablebuilder
+name:                csv-tables
 version:             0.1.0.0
-synopsis:            Hakyll project template from stack
+synopsis:            Generate Html tables from CSV files
 description:         Please see README.md
-homepage:            https://github.com/narrative/csv-tablebuilder#readme
+homepage:            https://github.com/narrative/csv-tables#readme
 license:             BSD3
 license-file:        LICENSE
 author:              Erik Stevenson
@@ -12,10 +12,11 @@ category:            Web
 build-type:          Simple
 cabal-version:       >=1.10
 
-executable csv-tablebuilder
-  main-is:             site.hs
+executable csv-tables
+  main-is:             Main.hs
+  hs-source-dirs:      src
   default-language:    Haskell2010
-  ghc-options:         -threaded
+  ghc-options:         -threaded -Wall
   build-depends:       base
                      , bytestring
                      , cassava

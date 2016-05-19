@@ -8,20 +8,18 @@
 
         <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/t/zf-5.5.2/jq-2.2.0,dt-1.10.11,r-2.0.2/datatables.min.css"/>
         <script type="text/javascript" src="https://cdn.datatables.net/t/zf-5.5.2/jq-2.2.0,dt-1.10.11,r-2.0.2/datatables.min.js"></script>
-        <link rel="stylesheet" type="text/css" href="/css/default.css" />
 
         <script>
         $$(document).ready(function(){
-            $$('#$table-id$').DataTable();
+            $$('table.display').DataTable();
         });
         </script>
 
     </head>
     <body>
         <div id="header">
-            <div><a href="/">$title$</a></div>
+            <div><a href="/">Return to examples</a></div>
         </div>
-
         <div id="content">
             <h1>$title$</h1>
             $body$
