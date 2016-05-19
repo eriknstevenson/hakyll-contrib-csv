@@ -1,5 +1,5 @@
 name:                hakyll-contrib-csv
-version:             0.1.0.1
+version:             0.1.0.2
 synopsis:            Generate Html tables from Csv files
 description:
   A Hakyll extension for incorporating Csv data into your static site.
