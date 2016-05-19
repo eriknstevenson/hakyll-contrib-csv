@@ -5,7 +5,7 @@ import qualified Data.ByteString.Lazy.Char8 as LBS
 import           Data.Char
 import           Data.Csv
 import           Data.Monoid
-import qualified Data.Text as T
+import qualified Data.Text.Lazy as T
 import qualified Data.Vector as V
 import           Lucid
 import           Hakyll
@@ -19,9 +19,10 @@ main = hakyll $ do
 
   match "csv/*.csv" $ do
     route $ setExtension "html" `composeRoutes` gsubRoute "csv/" (const "")
-    compile $ do
-      table <- csvCompiler
-      loadAndApplyTemplate "templates/default.html" (csvContext <> defaultContext) (fmap LBS.unpack table) >>= relativizeUrls
+    compile $
+      ((fmap . fmap) (T.unpack . renderText) $ csvCompiler)
+      >>= (\table -> loadAndApplyTemplate "templates/layout.html" (csvContext <> defaultContext) table)
+      >>= relativizeUrls
 
   match "templates/*" $ compile templateCompiler
 
@@ -33,18 +34,18 @@ data CSVFile = CSVFile
 instance FromNamedRecord CSVFile where
     parseNamedRecord r = CSVFile <$> r .: "id" <*> r .: "title"
 
-csvCompiler :: Compiler (Item LBS.ByteString)
+csvCompiler :: Compiler (Item (Html ()))
 csvCompiler = do
-  identifier <- T.pack . filterIdentifier <$> getUnderlying
+  identifier <- filterIdentifier <$> getUnderlying
   getResourceLBS >>= withItemBody (csvToHtml identifier)
 
-csvToHtml :: T.Text -> LBS.ByteString -> Compiler LBS.ByteString
+csvToHtml :: String -> LBS.ByteString -> Compiler (Html ())
 csvToHtml identifier bs =
   case decodeByName bs of
-    Left err -> return . LBS.pack $ err
-    Right (_, rows) -> return . renderBS $
+    Left err -> return mempty
+    Right (_, rows) -> return $
     --cellspacing_ "0"
-      table_ [id_ identifier, class_ "display", width_ "100%"] $ do
+      table_ [id_ (T.toStrict . T.pack $ identifier), class_ "display", width_ "100%"] $ do
         thead_ $ tr_ $ do
           th_ "id"
           th_ "title"
@@ -56,7 +57,7 @@ makeRow row = tr_ $ do
   td_ $ toHtml . show . courseID $ row
   td_ $ toHtml . title $ row
 
-csvContext = field "idname" $ return . filterIdentifier . itemIdentifier
+csvContext = field "table-id" $ return . filterIdentifier . itemIdentifier
 
-filterIdentifier = filter (isLetter) . show
+filterIdentifier = filter isLetter . show
 
