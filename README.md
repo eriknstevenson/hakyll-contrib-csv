@@ -1,6 +1,6 @@
-# CSV to HTML table generator
+# Csv to Html table generator for [Hakyll](https://hackage.haskell.org/package/hakyll)
 
-## Turn this
+## Turns this
 
 ```csv
 Year,Make,Model,Description,Price
@@ -14,7 +14,7 @@ air, moon roof, loaded",4799.00
 ## Into this
 
 ```html
-<table width="100%" class="display">
+<table>
     <thead>
         <tr>
             <td>Year</td>
