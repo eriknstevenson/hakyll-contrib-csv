@@ -15,11 +15,9 @@ import qualified Text.Blaze.Html5 as H
 
 spec :: Spec
 spec =
-  describe "csvTable" $
+  describe "csvTable" $ do
     it "generates correct Html." $
       (H.renderHtml . csvTableContents $ testCsv) `shouldBe` H.renderHtml testHtml
-    --describe "fails on invalid csv data" $ do
-
 
 data Person = Person {name :: !String, age :: !Int}
   deriving (Generic, Show)

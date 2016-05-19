@@ -1,8 +1,10 @@
 name:                hakyll-contrib-csv
 version:             0.1.0.0
-synopsis:            Generate Html tables from CSV files
-description:         Please see README.md
+synopsis:            Generate Html tables from Csv files
+description:
+  A Hakyll extension for incorporating Csv data into your static site.
 homepage:            https://github.com/narrative/hakyll-contrib-csv#readme
+bug-reports:         https://github.com/narrative/hakyll-contrib-csv/issues
 license:             BSD3
 license-file:        LICENSE
 author:              Erik Stevenson
@@ -20,7 +22,7 @@ library
   exposed-modules:     Hakyll.Contrib.Csv
   default-language:    Haskell2010
   ghc-options:         -Wall
-  build-depends:       base
+  build-depends:       base       < 4
                      , blaze-html
                      , bytestring
                      , cassava
@@ -33,7 +35,7 @@ test-suite hakyll-contrib-csv-spec
   type:                exitcode-stdio-1.0
   default-language:    Haskell2010
   ghc-options:         -Wall
-  build-depends:       base
+  build-depends:       base               < 4
                      , blaze-html
                      , bytestring
                      , cassava
