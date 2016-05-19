@@ -56,3 +56,24 @@ air, moon roof, loaded",4799.00
     </tbody>
 </table>
 ```
+
+# Usage
+
+```haskell
+{-# LANGUAGE OverloadedStrings #-}
+
+import Hakyll
+import Hakyll.Contrib.Csv
+
+main :: IO ()
+main = hakyll $ do
+
+  match "csv/*.csv" $ do
+    route $ setExtension "html" `composeRoutes` gsubRoute "csv/" (const "")
+    compile $
+      csvTable
+      >>= loadAndApplyTemplate "templates/layout.html" defaultContext
+      >>= relativizeUrls
+
+  match "templates/*" $ compile templateCompiler
+```
